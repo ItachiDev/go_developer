@@ -80,6 +80,17 @@ func CommentGetAll(w http.ResponseWriter, r *http.Request) {
 		comments[i].User[0].Password = ""
 
 		comments[i].Children = commentGetChildren(comments[i].ID)
+		vote.CommentID = comments[i].ID
+		vote.UserID = user.ID
+		count := db.Where(&vote).Find(&vote).RowsAffected
+
+		if count > 0 {
+			if vote.Value {
+				comments[i].HasVote = 1
+			} else {
+				comments[i].HasVote = 0
+			}
+		}
 	}
 
 	j, err := json.Marshal(comments)
